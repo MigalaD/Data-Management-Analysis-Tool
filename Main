@@ -1,0 +1,140 @@
+import tkinter as tk
+from tkinter import filedialog
+import pandas as pd
+import matplotlib.pyplot as plt
+
+data = None
+
+def load_data():
+    filename = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
+    try:
+        global data
+        data = pd.read_csv(filename)
+    except FileNotFoundError:
+        print("Nie znaleziono pliku.")
+
+def display_head():
+    output_text.delete(1.0, tk.END)
+    output_text.insert(tk.END, str(data.head()))
+
+def display_stats():
+    output_text.delete(1.0, tk.END)
+    output_text.insert(tk.END, str(data.describe()))
+
+def plot_bar_chart():
+    column = column_entry.get()
+    data[column].value_counts().plot(kind='bar')
+    plt.xlabel(column)
+    plt.ylabel('Liczba')
+    plt.title('Rozkład danych według ' + column)
+    plt.show()
+
+def filter_data():
+    column = column_entry.get()
+    value = value_entry.get()
+    filtered_data = data[data[column] == value]
+    output_text.delete(1.0, tk.END)
+    output_text.insert(tk.END, str(filtered_data))
+
+def sort_data():
+    column = column_entry.get()
+    sorted_data = data.sort_values(column)
+    output_text.delete(1.0, tk.END)
+    output_text.insert(tk.END, str(sorted_data))
+
+def merge_data():
+    filename = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
+    try:
+        data2 = pd.read_csv(filename)
+        merged_data = pd.merge(data, data2)
+        output_text.delete(1.0, tk.END)
+        output_text.insert(tk.END, str(merged_data))
+    except FileNotFoundError:
+        print("Nie znaleziono pliku.")
+
+def calculate_group_stats():
+    column = column_entry.get()
+    agg_column = agg_column_entry.get()
+    grouped_data = data.groupby(column).agg({agg_column: 'mean'})
+    output_text.delete(1.0, tk.END)
+    output_text.insert(tk.END, str(grouped_data))
+
+def plot_line_chart():
+    x_column = x_column_entry.get()
+    y_column = y_column_entry.get()
+    data.plot(x=x_column, y=y_column, kind='line')
+    plt.xlabel(x_column)
+    plt.ylabel(y_column)
+    plt.title('Wykres liniowy')
+    plt.show()
+
+def browse_files():
+    filename = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
+    file_entry.delete(0, tk.END)
+    file_entry.insert(tk.END, filename)
+
+def clear_output():
+    output_text.delete(1.0, tk.END)
+
+root = tk.Tk()
+root.title("Narzędzie do zarządzania i analizy danych")
+
+# Przyciski i pola tekstowe
+load_button = tk.Button(root, text="Wczytaj dane", command=load_data)
+load_button.pack(pady=10)
+
+file_entry = tk.Entry(root, width=50)
+file_entry.pack()
+
+browse_button = tk.Button(root, text="Przeglądaj", command=browse_files)
+browse_button.pack(pady=5)
+
+output_text = tk.Text(root, height=10, width=50)
+output_text.pack(pady=10)
+
+column_label = tk.Label(root, text="Nazwa kolumny:")
+column_label.pack()
+
+column_entry = tk.Entry(root, width=30)
+column_entry.pack()
+
+value_label = tk.Label(root, text="Wartość:")
+value_label.pack()
+
+value_entry = tk.Entry(root, width=30)
+value_entry.pack()
+
+filter_button = tk.Button(root, text="Filtruj dane", command=filter_data)
+filter_button.pack(pady=5)
+
+sort_button = tk.Button(root, text="Sortuj dane", command=sort_data)
+sort_button.pack(pady=5)
+
+agg_column_label = tk.Label(root, text="Kolumna do obliczenia statystyk:")
+agg_column_label.pack()
+
+agg_column_entry = tk.Entry(root, width=30)
+agg_column_entry.pack()
+
+group_stats_button = tk.Button(root, text="Oblicz statystyki dla grup", command=calculate_group_stats)
+group_stats_button.pack(pady=5)
+
+x_column_label = tk.Label(root, text="Kolumna X:")
+x_column_label.pack()
+
+x_column_entry = tk.Entry(root, width=30)
+x_column_entry.pack()
+
+y_column_label = tk.Label(root, text="Kolumna Y:")
+y_column_label.pack()
+
+y_column_entry = tk.Entry(root, width=30)
+y_column_entry.pack()
+
+plot_line_chart_button = tk.Button(root, text="Generuj wykres liniowy", command=plot_line_chart)
+plot_line_chart_button.pack(pady=5)
+
+clear_button = tk.Button(root, text="Wyczyść wynik", command=clear_output)
+clear_button.pack(pady=10)
+
+root.mainloop()
