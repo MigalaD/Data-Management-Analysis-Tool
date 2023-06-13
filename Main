@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import ttk
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -12,6 +13,13 @@ def load_data():
         data = pd.read_csv(filename)
     except FileNotFoundError:
         print("Nie znaleziono pliku.")
+
+def export_data():
+    if data is not None:
+        filename = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
+        data.to_csv(filename, index=False)
+    else:
+        print("Brak danych do eksportu.")
 
 def display_head():
     output_text.delete(1.0, tk.END)
@@ -79,62 +87,77 @@ def clear_output():
 root = tk.Tk()
 root.title("Narzędzie do zarządzania i analizy danych")
 
+style = ttk.Style()
+style.theme_use("clam")
+
 # Przyciski i pola tekstowe
-load_button = tk.Button(root, text="Wczytaj dane", command=load_data)
+load_button = ttk.Button(root, text="Wczytaj dane", command=load_data)
 load_button.pack(pady=10)
 
-file_entry = tk.Entry(root, width=50)
+export_button = ttk.Button(root, text="Eksportuj dane", command=export_data)
+export_button.pack(pady=5)
+
+file_entry = ttk.Entry(root, width=50)
 file_entry.pack()
 
-browse_button = tk.Button(root, text="Przeglądaj", command=browse_files)
+browse_button = ttk.Button(root, text="Przeglądaj pliki", command=browse_files)
 browse_button.pack(pady=5)
 
-output_text = tk.Text(root, height=10, width=50)
-output_text.pack(pady=10)
+head_button = ttk.Button(root, text="Wyświetl początek danych", command=display_head)
+head_button.pack(pady=5)
 
-column_label = tk.Label(root, text="Nazwa kolumny:")
+stats_button = ttk.Button(root, text="Wyświetl statystyki", command=display_stats)
+stats_button.pack(pady=5)
+
+column_label = ttk.Label(root, text="Kolumna:")
 column_label.pack()
 
-column_entry = tk.Entry(root, width=30)
+column_entry = ttk.Entry(root, width=30)
 column_entry.pack()
 
-value_label = tk.Label(root, text="Wartość:")
+value_label = ttk.Label(root, text="Wartość:")
 value_label.pack()
 
-value_entry = tk.Entry(root, width=30)
+value_entry = ttk.Entry(root, width=30)
 value_entry.pack()
 
-filter_button = tk.Button(root, text="Filtruj dane", command=filter_data)
+filter_button = ttk.Button(root, text="Filtruj dane", command=filter_data)
 filter_button.pack(pady=5)
 
-sort_button = tk.Button(root, text="Sortuj dane", command=sort_data)
+sort_button = ttk.Button(root, text="Sortuj dane", command=sort_data)
 sort_button.pack(pady=5)
 
-agg_column_label = tk.Label(root, text="Kolumna do obliczenia statystyk:")
+merge_button = ttk.Button(root, text="Połącz z innym plikiem", command=merge_data)
+merge_button.pack(pady=5)
+
+agg_column_label = ttk.Label(root, text="Kolumna do obliczenia statystyk:")
 agg_column_label.pack()
 
-agg_column_entry = tk.Entry(root, width=30)
+agg_column_entry = ttk.Entry(root, width=30)
 agg_column_entry.pack()
 
-group_stats_button = tk.Button(root, text="Oblicz statystyki dla grup", command=calculate_group_stats)
+group_stats_button = ttk.Button(root, text="Oblicz statystyki dla grup", command=calculate_group_stats)
 group_stats_button.pack(pady=5)
 
-x_column_label = tk.Label(root, text="Kolumna X:")
+x_column_label = ttk.Label(root, text="Kolumna X:")
 x_column_label.pack()
 
-x_column_entry = tk.Entry(root, width=30)
+x_column_entry = ttk.Entry(root, width=30)
 x_column_entry.pack()
 
-y_column_label = tk.Label(root, text="Kolumna Y:")
+y_column_label = ttk.Label(root, text="Kolumna Y:")
 y_column_label.pack()
 
-y_column_entry = tk.Entry(root, width=30)
+y_column_entry = ttk.Entry(root, width=30)
 y_column_entry.pack()
 
-plot_line_chart_button = tk.Button(root, text="Generuj wykres liniowy", command=plot_line_chart)
+plot_line_chart_button = ttk.Button(root, text="Generuj wykres liniowy", command=plot_line_chart)
 plot_line_chart_button.pack(pady=5)
 
-clear_button = tk.Button(root, text="Wyczyść wynik", command=clear_output)
+clear_button = ttk.Button(root, text="Wyczyść wynik", command=clear_output)
 clear_button.pack(pady=10)
+
+output_text = tk.Text(root, height=10, width=70)
+output_text.pack(pady=10)
 
 root.mainloop()
